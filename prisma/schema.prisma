@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id                   String        @id @default(cuid())
+  username             String        @unique
+  email                String?       @unique
+  passwordHash         String
+  role                 String        @default("USER") // "USER" | "ADMIN"
+  sustainabilityScore  Float         @default(100.0)
+  totalCarbonFootprint Float         @default(0.0)
+  streakCount          Int           @default(0)
+  level                Int           @default(1)
+  xp                   Int           @default(0)
+  defaultRegion        String        @default("GLOBAL")
+  
+  // Private Profile Fields
+  fullName             String?
+  age                  Int?
+  gender               String?
+  place                String?
+  job                  String?
+  profileCompleted     Boolean       @default(false)
+  baselineCo2          Float         @default(12.0)
+  
+  lastActivityDate     DateTime?
+  createdAt            DateTime      @default(now())
+  updatedAt            DateTime      @updatedAt
+
+  activities           Activity[]
+  achievements         Achievement[]
+  userQuests           UserQuest[]
+}
+
+model EmissionFactor {
+  id          String   @id
+  category    String
+  subcategory String
+  factor      Float
+  unit        String
+  region      String
+  sourceOrg   String
+  sourceUrl   String
+  lastUpdated DateTime @default(now())
+}
+
+model Activity {
+  id               String   @id @default(cuid())
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name             String
+  category         String
+  quantity         Float
+  unit             String
+  co2Emission      Float
+  timestamp        DateTime @default(now())
+  emissionFactorId String?
+  formulaUsed      String
+  sourceDetails    String
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badgeId     String
+  name        String
+  description String
+  unlockedAt  DateTime @default(now())
+}
+
+model UserQuest {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questId      String
+  title        String
+  description  String
+  xpReward     Int
+  co2Reduction Float
+  completed    Boolean  @default(false)
+  assignedAt   DateTime @default(now())
+}
