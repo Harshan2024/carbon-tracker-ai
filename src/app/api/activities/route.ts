@@ -1,3 +1,4 @@
+export const dynamic = 'forc-dynamic';
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { type NextRequest } from "next/server";
