@@ -1,4 +1,4 @@
-export const dynamic = 'forc-dynamic';
+export const dynamic = 'force-dynamic';
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { type NextRequest } from "next/server";
