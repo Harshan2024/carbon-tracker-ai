@@ -167,7 +167,8 @@ export default function LoginPage() {
         toast.error(errData.error || "Invalid username or password. Check 'Auto-Register' to sign up.");
         setSocialModal((prev) => ({ ...prev, step: "custom_input" }));
       }
-    } catch {
+    } catch (err) {
+      console.error("Custom social auth error:", err);
       toast.error("Social login connection error.");
       setSocialModal((prev) => ({ ...prev, step: "custom_input" }));
     }
@@ -208,7 +209,8 @@ export default function LoginPage() {
       } else {
         router.push("/profile-setup");
       }
-    } catch {
+    } catch (err) {
+      console.error("Auth submit error:", err);
       toast.error("Connection error. Please try again.");
     } finally {
       setLoading(false);
@@ -616,7 +618,7 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 required
-                minLength={4}
+                minLength={6}
                 value={form.password}
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
@@ -1206,6 +1208,7 @@ export default function LoginPage() {
                       type="password"
                       placeholder="••••••••"
                       required
+                      minLength={6}
                       value={customSocial.password}
                       onChange={(e) => setCustomSocial({ ...customSocial, password: e.target.value })}
                       style={inputStyle}

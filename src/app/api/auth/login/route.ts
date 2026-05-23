@@ -9,6 +9,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { username, password } = body;
 
+    console.log("Login payload:", { username, passwordLength: password?.length });
+
     // ── Validation ──
     if (!username || !password) {
       return NextResponse.json(
@@ -17,10 +19,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // ── Find user ──
-    const user = await prisma.user.findUnique({
-      where: { username },
+    const searchVal = username.trim();
+
+    // ── Find user by username OR email (case-insensitive) ──
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: { equals: searchVal, mode: "insensitive" as const } },
+          { email: { equals: searchVal, mode: "insensitive" as const } },
+        ],
+      },
     });
+
+    console.log("User lookup result:", user ? { id: user.id, username: user.username, email: user.email } : "User not found");
 
     if (!user) {
       return NextResponse.json(
@@ -31,6 +42,7 @@ export async function POST(request: Request) {
 
     // ── Verify password ──
     const isValid = await bcrypt.compare(password, user.passwordHash);
+    console.log("Password comparison result:", isValid);
 
     if (!isValid) {
       return NextResponse.json(

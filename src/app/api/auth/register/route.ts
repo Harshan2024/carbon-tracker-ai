@@ -24,12 +24,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // ── Check for existing user ──
+    const checkUsername = username.trim();
+    const checkEmail = email ? email.trim() : undefined;
+
+    // ── Check for existing user (case-insensitive) ──
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
-          { username },
-          ...(email ? [{ email }] : []),
+          { username: { equals: checkUsername, mode: "insensitive" as const } },
+          ...(checkEmail ? [{ email: { equals: checkEmail, mode: "insensitive" as const } }] : []),
         ],
       },
     });
